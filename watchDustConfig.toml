@@ -1,6 +1,6 @@
 Title = "Watch Dsut"
 
-# 미세먼지 팍악 간격(알림)
+# 미세먼지 파악(알림) 간격
 WatchIntervalHour = 3
 
 [openapi_airkorea]
