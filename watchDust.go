@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -20,9 +21,8 @@ var fineDustMsg = ""
 var conf serverConfig
 
 func loadConfig() {
-
 	// 파일로 부터 파싱해서 conf 로 저장하기
-	_, err := toml.DecodeFile("watchdustConfig.toml", &conf)
+	_, err := toml.DecodeFile("watchDustConfig.toml", &conf)
 	if err != nil {
 		log.Println(err)
 		os.Exit(1)
@@ -54,9 +54,10 @@ func watchingDust() {
 	// 	}
 	// }()
 	// wg.Wait()
-
 	c := cron.New()
 	// c.AddFunc("0 30 * * * *", func() { fmt.Println("Every hour on the half hour") })
+	// every second
+	// c.AddFunc("* * * * * *", func() { analDustInfo(openapiAirKorea()) })
 	// every minute
 	// c.AddFunc("0 */1 * * * *", func() { analDustInfo(openapiAirKorea()) })
 	// c.AddFunc("@hourly", func() { fmt.Println("Every hour") })
@@ -175,17 +176,18 @@ func analDustInfo(jsonDustInfo *dustinfoResp) {
 
 	log.Println(dustinfoMsg)
 
+	sendToSlack(dustinfoMsg)
 }
 
 func toGradeStr(grade string) string {
 	if grade == "1" {
-		return "좋음"
+		return "좋음:party_parrot:"
 	} else if grade == "2" {
-		return "보통"
+		return "보통:smile:"
 	} else if grade == "3" {
-		return "나쁨"
+		return "나쁨:angry:"
 	} else if grade == "4" {
-		return "매우나쁨"
+		return "매우나쁨:angryyy:"
 	}
 	return "_"
 }
@@ -196,4 +198,26 @@ func GetEncURL(str string) string {
 	encurl := t.String()
 	fmt.Printf("encode url(%s) = %s\n", str, encurl)
 	return encurl
+}
+
+func sendToSlack(msg string) {
+	content := "token=" + conf.SlackAPI.Token +
+		"&channel=" + conf.SlackAPI.Channel +
+		"&username=" + conf.SlackAPI.Username +
+		"&text=" + msg
+	// log.Println(content)
+	reqBody := bytes.NewBufferString(content)
+	resp, err := http.Post("https://slack.com/api/chat.postMessage", "application/x-www-form-urlencoded", reqBody)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	defer resp.Body.Close()
+
+	respBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Println(err)
+	} else {
+		log.Printf("%s ... send to slack is success\n", string(respBody))
+	}
 }

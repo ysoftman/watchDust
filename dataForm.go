@@ -11,6 +11,11 @@ type serverConfig struct {
 		DataTerm    string `toml:"dataTerm"`
 		Ver         string `toml:"ver"`
 	} `toml:"openapi_airkorea"`
+	SlackAPI struct {
+		Token    string `toml:"token"`
+		Channel  string `toml:"channel"`
+		Username string `toml:"username"`
+	} `toml:"slack_api"`
 }
 
 type dustinfoResp struct {
