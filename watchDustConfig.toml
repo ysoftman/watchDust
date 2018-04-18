@@ -1,0 +1,18 @@
+Title = "Watch Dsut"
+
+# 미세먼지 팍악 간격(알림)
+WatchIntervalHour = 3
+
+[openapi_airkorea]
+# 서비스키
+servicekey = ""
+# 한 페이지 결과 수
+numOfRows = 10
+# 페이지 번호
+pageNo = 1
+# 측정소 이름
+stationName = "수내동"
+# 요청 데이터기간 (하루 : DAILY, 한달 : MONTH, 3달 : 3MONTH)
+dataTerm = "DAILY"
+# 버전별 상세 결과 참고문서 참조
+ver = "1.3"
