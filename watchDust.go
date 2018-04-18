@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/BurntSushi/toml"
 	"github.com/PuerkitoBio/goquery"
@@ -67,6 +68,9 @@ func watchingDust() {
 	c.AddFunc("0 0 */"+strconv.Itoa(conf.WatchIntervalHour)+" * * *", func() { analDustInfo(openapiAirKorea()) })
 	c.Start()
 	for {
+		select {
+		case <-time.After(10 * time.Second):
+		}
 	}
 }
 
