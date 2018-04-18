@@ -27,5 +27,5 @@ go get github.com/PuerkitoBio/goquery
 go build
 
 # execute
-./watchdust openapi_airkorea_servicekey
+./watchdust &
 ```
