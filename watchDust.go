@@ -188,7 +188,7 @@ func analDustInfo(jsonDustInfo *dustinfoResp) {
 
 func toWHOPM10GradeStr(value string) string {
 	nValue, err := strconv.Atoi(value)
-	if err == nil {
+	if err != nil {
 		log.Println(err)
 		return "_"
 	}
@@ -212,7 +212,7 @@ func toWHOPM10GradeStr(value string) string {
 
 func toWHOPM25GradeStr(value string) string {
 	nValue, err := strconv.Atoi(value)
-	if err == nil {
+	if err != nil {
 		log.Println(err)
 		return "_"
 	}
