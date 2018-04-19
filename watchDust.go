@@ -56,7 +56,7 @@ func watchingDust() {
 	// }()
 	// wg.Wait()
 
-	analDustInfo(openapiAirKorea())
+	// analDustInfo(openapiAirKorea())
 
 	c := cron.New()
 	// c.AddFunc("0 30 * * * *", func() { fmt.Println("Every hour on the half hour") })
