@@ -66,7 +66,8 @@ func watchingDust() {
 	// c.AddFunc("0 */1 * * * *", func() { analDustInfo(openapiAirKorea()) })
 	// c.AddFunc("@hourly", func() { fmt.Println("Every hour") })
 	// 9~21시 사이 n 시 간격으로 => 9 12 15 18 21시
-	c.AddFunc("0 0 9-21/"+strconv.Itoa(conf.WatchIntervalHour)+" * * *", func() { analDustInfo(openapiAirKorea()) })
+	// 0분(정각)이면 1시간 이전 미세먼지 정보를 받아와 매시 5분에 파악
+	c.AddFunc("0 5 9-21/"+strconv.Itoa(conf.WatchIntervalHour)+" * * *", func() { analDustInfo(openapiAirKorea()) })
 	c.Start()
 	for {
 		select {
