@@ -37,6 +37,14 @@ func main() {
 	// 	fmt.Printf("ex) %s [airkorea service key]\n", os.Args[0])
 	// 	os.Exit(1)
 	// }
+	f, err := os.OpenFile("wd.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatal("can't open log file")
+	}
+	defer f.Close()
+	log.SetOutput(f)
+	log.Println("start Watch-Dust")
+
 	loadConfig()
 	watchingDust()
 }
@@ -136,8 +144,8 @@ func openapiAirKorea() *dustinfoResp {
 		log.Println("can't read resp.Body")
 	}
 
-	// bodystring := string(body)
-	// fmt.Println(bodystring)
+	bodystring := string(body)
+	log.Println(bodystring)
 
 	jsonDustInfo := &dustinfoResp{}
 	json.Unmarshal([]byte(body), &jsonDustInfo)
