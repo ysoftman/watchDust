@@ -216,7 +216,7 @@ func toWHOPM10GradeStr(value string) string {
 	} else if nValue <= 150 {
 		return "매우나쁨:angryy:"
 	}
-	return "최악:angry:"
+	return "최악:angryyy:"
 }
 
 func toWHOPM25GradeStr(value string) string {
@@ -240,7 +240,7 @@ func toWHOPM25GradeStr(value string) string {
 	} else if nValue <= 75 {
 		return "매우나쁨:angryy:"
 	}
-	return "최악:angry:"
+	return "최악:angryyy:"
 }
 
 func toGradeStr(grade string) string {
