@@ -32,11 +32,6 @@ func loadConfig() {
 }
 
 func main() {
-	// fineDustMsg = fineDustSearch()
-	// if len(os.Args) != 2 {
-	// 	fmt.Printf("ex) %s [airkorea service key]\n", os.Args[0])
-	// 	os.Exit(1)
-	// }
 	f, err := os.OpenFile("wd.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		log.Fatal("can't open log file")
@@ -124,7 +119,6 @@ func fineDustSearch() string {
 func openapiAirKorea() *dustinfoResp {
 	url := "http://openapi.airkorea.or.kr/openapi/services/rest/ArpltnInforInqireSvc/getMsrstnAcctoRltmMesureDnsty?numOfRows=" + strconv.Itoa(conf.OpenapiAirkorea.NumOfRows) +
 		"&pageNo=" + strconv.Itoa(conf.OpenapiAirkorea.PageNo) +
-		"&startPage=1" +
 		"&stationName=" + GetEncURL(conf.OpenapiAirkorea.StationName) +
 		"&dataTerm=" + conf.OpenapiAirkorea.DataTerm +
 		"&ver=" + conf.OpenapiAirkorea.Ver +
