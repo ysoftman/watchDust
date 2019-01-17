@@ -1,4 +1,4 @@
-# Watch-Dust :smile: ~
+# Watch-Dust :smile:
 
 ## 개발 환경
 
