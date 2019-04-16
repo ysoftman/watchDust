@@ -33,3 +33,58 @@ go build
 # execute
 ./watchdust
 ```
+
+## google app engine 사용
+
+```bash
+wget https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-228.0.0-darwin-x86_64.tar.gz
+tar zxvf google-cloud-sdk-228.0.0-darwin-x86_64.tar.gz
+# ./google-cloud-sdk/install.sh # 선택사항으로 특정 경로에 sdk 를 추가할때
+export PATH=$PATH:~/workspace/google-cloud-sdk/bin
+gcloud components install app-engine-go
+GO111MODULE=on go get -u google.golang.org/appengine/...
+
+# log
+https://cloud.google.com/appengine/docs/standard/go/logs/
+# cron.yaml
+https://cloud.google.com/appengine/docs/standard/go/config/cron
+# app.yaml
+https://cloud.google.com/appengine/docs/standard/go/config/appref
+
+
+# google cloud 올리기전에 로컬에서 테스트 해볼 수 있다.
+# 아래 명령을 실행해두면 .go 소스 수정때마다 자동 빌드되어 된다.
+dev_appserver.py app.yaml --port 9999
+
+# google cloud 초기화
+# url 링크 후 verification code 확인하여 입력
+# 기존 프로젝트 또는 신규 프로젝트 생성 선택
+# Compute Region and Zone 선택
+gcloud init
+
+# glcoud  구글 app engine 에 배포하기
+# 배포 종료시 접속 가능한 url 이 표시된다.
+# 배포전 아래 내용이 출력된다. 이상이 있다면 gcloud init 로 다시 설정하자.
+# descriptor:      [/Users/ysoftman/workspace/watchDust/app.yaml]
+# source:          [/Users/ysoftman/workspace/watchDust]
+# target project:  [watchdust]
+# target service:  [default]
+# target version:  [20190416t141405]
+# target url:      [https://watchdust.appspot.com]
+# --verion 버전 명시
+# --promote 현재 배포한 버전이 모든 트랙픽(100%)을 받도록 한다. 기존 버전의 인스턴스는 트랙픽 0% 이 된다.
+gcloud app deploy ./app.yaml --version 20190416 --promote
+
+# 크론 작업 cron.yaml
+gcloud app deploy cron.yaml
+
+# 배포가 완료되면 확인
+https://watchdust.appspot.com
+
+# 배포 후 접속 URL 확인 하기
+gcloud app browse
+
+# 앱 로그 확인
+https://console.cloud.google.com/logs/viewer?project=watchdust
+gcloud app logs tail -s default
+```

@@ -1,0 +1,10 @@
+runtime: go
+api_version: go1
+handlers:
+- url: /.*
+  script: _go_app
+
+# app engine 업로드에서 제외
+skip_files:
+- ^(.*/)?.*\.bak$
+- logs/

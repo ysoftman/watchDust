@@ -15,11 +15,39 @@ import (
 	"github.com/BurntSushi/toml"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/robfig/cron"
+	"google.golang.org/appengine"
+	appenginelog "google.golang.org/appengine/log"
+	"google.golang.org/appengine/urlfetch"
 )
 
 var fineDustMsg = ""
 
 var conf serverConfig
+
+// GetEncURL : URL 인코딩
+func GetEncURL(str string) string {
+	t := &url.URL{Path: str}
+	encurl := t.String()
+	fmt.Printf("encode url(%s) = %s\n", str, encurl)
+	return encurl
+}
+
+func getAirKoreaURL() string {
+	return "http://openapi.airkorea.or.kr/openapi/services/rest/ArpltnInforInqireSvc/getMsrstnAcctoRltmMesureDnsty?numOfRows=" + strconv.Itoa(conf.OpenapiAirkorea.NumOfRows) +
+		"&pageNo=" + strconv.Itoa(conf.OpenapiAirkorea.PageNo) +
+		"&stationName=" + GetEncURL(conf.OpenapiAirkorea.StationName) +
+		"&dataTerm=" + conf.OpenapiAirkorea.DataTerm +
+		"&ver=" + conf.OpenapiAirkorea.Ver +
+		"&_returnType=json" +
+		"&serviceKey=" + conf.OpenapiAirkorea.Servicekey
+}
+
+func getSlackURL(msg string) string {
+	return "token=" + conf.SlackAPI.Token +
+		"&channel=" + conf.SlackAPI.Channel +
+		"&username=" + conf.SlackAPI.Username +
+		"&text=" + msg
+}
 
 func loadConfig() {
 	// 파일로 부터 파싱해서 conf 로 저장하기
@@ -32,16 +60,40 @@ func loadConfig() {
 }
 
 func main() {
-	f, err := os.OpenFile("wd.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-	if err != nil {
-		log.Fatal("can't open log file")
-	}
-	defer f.Close()
-	log.SetOutput(f)
-	log.Println("start Watch-Dust")
-
 	loadConfig()
-	watchingDust()
+
+	// 20190406 google compute engine 무료 기간 만료
+	// App Engine에서 애플리케이션이 배포되어 있는 로컬 파일 시스템은 쓸 수 없습니다.
+	// google.golang.org/appengine/log 으로 로깅 가능하다.
+	// f, err := os.OpenFile("wd.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	// if err != nil {
+	// 	log.Fatal("can't open log file")
+	// }
+	// defer f.Close()
+	// log.SetOutput(f)
+	// log.Println("start Watch-Dust")
+	// 일반 서버 환경으로 운영시
+	// watchingDust()
+
+	// GAE(google app engine) 환경
+	http.HandleFunc("/", handlerIndex)
+	http.HandleFunc("/watchDust", handlerWatchingDust)
+	appengine.Main()
+}
+
+func handlerIndex(w http.ResponseWriter, r *http.Request) {
+	ctx := appengine.NewContext(r)
+	appenginelog.Infof(ctx, "/ 요청 처리")
+	fmt.Fprintln(w, "watchDust app-engine")
+}
+
+func handlerWatchingDust(w http.ResponseWriter, r *http.Request) {
+	ctx := appengine.NewContext(r)
+	appenginelog.Infof(ctx, "/watchDust 요청 처리")
+	dustinfomsg := analDustInfo(openapiAirKoreaGAE(r))
+	sendToSlackGAE(r, dustinfomsg)
+	out := "handlerWatchingDust()\n" + dustinfomsg
+	fmt.Fprintln(w, out)
 }
 
 func watchingDust() {
@@ -69,7 +121,7 @@ func watchingDust() {
 	// c.AddFunc("0 */1 * * * *", func() { analDustInfo(openapiAirKorea()) })
 	// c.AddFunc("@hourly", func() { fmt.Println("Every hour") })
 	// 9~21시 사이 n 시 간격으로 => 9 12 15 18 21시
-	c.AddFunc("0 0 9-21/"+strconv.Itoa(conf.WatchIntervalHour)+" * * *", func() { analDustInfo(openapiAirKorea()) })
+	c.AddFunc("0 0 9-21/"+strconv.Itoa(conf.WatchIntervalHour)+" * * *", func() { sendToSlack(analDustInfo(openapiAirKorea())) })
 	c.Start()
 	for {
 		select {
@@ -115,16 +167,37 @@ func fineDustSearch() string {
 	return msg
 }
 
+func openapiAirKoreaGAE(r *http.Request) *dustinfoResp {
+	url := getAirKoreaURL()
+	// appengine 에서는 기본 http client 를 할 수 없다.
+	// google.golang.org/appengine/urlfetch 를 사용해야 하나.
+	// http.DefaultTransport and http.DefaultClient are not available in App Engine. See https://cloud.google.com/appengine/docs/go/urlfetch/
+	// resp, err := http.Get(url)
+	ctx := appengine.NewContext(r)
+	client := urlfetch.Client(ctx)
+	resp, err := client.Get(url)
+	if err != nil {
+		log.Println(err.Error())
+	}
+	defer resp.Body.Close()
+
+	// 응답결과 출력
+	// ioutil.ReadAll 로 resp.Body 읽고 나면 resp.Body 내용은 사라진다.
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Println("can't read resp.Body")
+	}
+	bodystring := string(body)
+	log.Println(bodystring)
+	jsonDustInfo := &dustinfoResp{}
+	json.Unmarshal([]byte(body), &jsonDustInfo)
+
+	return jsonDustInfo
+}
+
 // 공공데이터 airkorea 로 부터 미세먼지 정보 파악
 func openapiAirKorea() *dustinfoResp {
-	url := "http://openapi.airkorea.or.kr/openapi/services/rest/ArpltnInforInqireSvc/getMsrstnAcctoRltmMesureDnsty?numOfRows=" + strconv.Itoa(conf.OpenapiAirkorea.NumOfRows) +
-		"&pageNo=" + strconv.Itoa(conf.OpenapiAirkorea.PageNo) +
-		"&stationName=" + GetEncURL(conf.OpenapiAirkorea.StationName) +
-		"&dataTerm=" + conf.OpenapiAirkorea.DataTerm +
-		"&ver=" + conf.OpenapiAirkorea.Ver +
-		"&_returnType=json" +
-		"&serviceKey=" + conf.OpenapiAirkorea.Servicekey
-
+	url := getAirKoreaURL()
 	resp, err := http.Get(url)
 	if err != nil {
 		log.Println(err.Error())
@@ -137,17 +210,15 @@ func openapiAirKorea() *dustinfoResp {
 	if err != nil {
 		log.Println("can't read resp.Body")
 	}
-
 	bodystring := string(body)
 	log.Println(bodystring)
-
 	jsonDustInfo := &dustinfoResp{}
 	json.Unmarshal([]byte(body), &jsonDustInfo)
 
 	return jsonDustInfo
 }
 
-func analDustInfo(jsonDustInfo *dustinfoResp) {
+func analDustInfo(jsonDustInfo *dustinfoResp) string {
 
 	// dataTime		측정일
 	// mangName		측정망 정보
@@ -171,7 +242,7 @@ func analDustInfo(jsonDustInfo *dustinfoResp) {
 	// pm25Grade1h	미세먼지(PM2.5) 1시간 등급
 	if len(jsonDustInfo.List) < 1 {
 		log.Printf("%s 측정소 정보가 없습니다.", conf.OpenapiAirkorea.StationName)
-		return
+		return ""
 	}
 	i := 0
 	dustinfoMsg := "측정시간: " + jsonDustInfo.List[i].DataTime + "\n" +
@@ -186,7 +257,7 @@ func analDustInfo(jsonDustInfo *dustinfoResp) {
 		"초미세먼지(pm25): " + jsonDustInfo.List[i].Pm25Value + "㎍/㎥(" + toWHOPM25GradeStr(jsonDustInfo.List[i].Pm25Value) + ")" + "\n"
 	log.Println(dustinfoMsg)
 
-	sendToSlack(dustinfoMsg)
+	return dustinfoMsg
 }
 
 func toWHOPM10GradeStr(value string) string {
@@ -250,20 +321,38 @@ func toGradeStr(grade string) string {
 	return "_"
 }
 
-// GetEncURL : URL 인코딩
-func GetEncURL(str string) string {
-	t := &url.URL{Path: str}
-	encurl := t.String()
-	fmt.Printf("encode url(%s) = %s\n", str, encurl)
-	return encurl
+func sendToSlackGAE(r *http.Request, msg string) {
+	content := getSlackURL(msg)
+	reqBody := bytes.NewBufferString(content)
+
+	// appengine 에서는 기본 http client 를 할 수 없다.
+	// google.golang.org/appengine/urlfetch 를 사용해야 하나.
+	// http.DefaultTransport and http.DefaultClient are not available in App Engine. See https://cloud.google.com/appengine/docs/go/urlfetch/
+	// resp, err := http.Post("https://slack.com/api/chat.postMessage", "application/x-www-form-urlencoded", reqBody)
+	ctx := appengine.NewContext(r)
+	client := urlfetch.Client(ctx)
+	resp, err := client.Post("https://slack.com/api/chat.postMessage", "application/x-www-form-urlencoded", reqBody)
+	if err != nil {
+		log.Println(err.Error())
+	}
+	defer resp.Body.Close()
+
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	defer resp.Body.Close()
+
+	respBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Println(err)
+	} else {
+		log.Printf("%s ... send to slack is success\n", string(respBody))
+	}
 }
 
 func sendToSlack(msg string) {
-	content := "token=" + conf.SlackAPI.Token +
-		"&channel=" + conf.SlackAPI.Channel +
-		"&username=" + conf.SlackAPI.Username +
-		"&text=" + msg
-	// log.Println(content)
+	content := getSlackURL(msg)
 	reqBody := bytes.NewBufferString(content)
 	resp, err := http.Post("https://slack.com/api/chat.postMessage", "application/x-www-form-urlencoded", reqBody)
 	if err != nil {

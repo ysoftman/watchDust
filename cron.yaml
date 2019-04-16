@@ -1,0 +1,7 @@
+cron:
+- description: "watchDust cron job!"
+  url: /watchDust
+  # schedule: every 24 hours
+  # schedule: every 5 minutes from 9:00 to 21:00
+  schedule: every 3 hours from 9:00 to 21:00
+  # schedule: every 1 mins
