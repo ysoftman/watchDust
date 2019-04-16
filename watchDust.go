@@ -57,9 +57,16 @@ func handlerIndex(w http.ResponseWriter, r *http.Request) {
 디폴트 측정소 미세먼지 정보
 https://watchdust.appspot.com/watchDust
 
-수내동 측정소 미세먼지 정보, 슬랙 dustinfo 채널에 미세먼지 정보 메시지 보내기
+수내동 측정소 미세먼지 정보
+dustinfo 슬랙 채널에 미세먼지 정보 발송
 https://watchdust.appspot.com/watchDust?station=수내동&slack=dustinfo
-	`
+
+측정소(station) 이름
+https://www.airkorea.or.kr/web/stationInfo
+
+github
+https://github.com/ysoftman/watchDust
+`
 	fmt.Fprintln(w, out)
 }
 
