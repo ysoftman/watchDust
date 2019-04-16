@@ -24,7 +24,7 @@ func GetEncURL(str string) string {
 func getAirKoreaURL(stationName string) string {
 	sn := conf.OpenapiAirkorea.StationName
 	if len(stationName) > 0 {
-		// sn = stationName
+		sn = stationName
 	}
 	return "http://openapi.airkorea.or.kr/openapi/services/rest/ArpltnInforInqireSvc/getMsrstnAcctoRltmMesureDnsty?numOfRows=" + strconv.Itoa(conf.OpenapiAirkorea.NumOfRows) +
 		"&pageNo=" + strconv.Itoa(conf.OpenapiAirkorea.PageNo) +
