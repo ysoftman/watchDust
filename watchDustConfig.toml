@@ -11,7 +11,7 @@ numOfRows = 10
 # 페이지 번호
 pageNo = 1
 # 측정소 이름
-stationName = "수내동"
+stationName = "대왕판교로(백현동)"
 # 요청 데이터기간 (하루 : DAILY, 한달 : MONTH, 3달 : 3MONTH)
 dataTerm = "DAILY"
 # 버전별 상세 결과 참고문서 참조
