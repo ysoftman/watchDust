@@ -1,10 +1,4 @@
-runtime: go
-api_version: go1
+runtime: go111
 handlers:
-- url: /.*
-  script: _go_app
-
-# app engine 업로드에서 제외
-skip_files:
-- ^(.*/)?.*\.bak$
-- logs/
+  - url: /.*
+    script: auto

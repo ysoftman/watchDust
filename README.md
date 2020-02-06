@@ -46,12 +46,21 @@ go build
 ## google app engine 사용
 
 ```bash
+# gcloud 설치 - mac
 wget https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-228.0.0-darwin-x86_64.tar.gz
 tar zxvf google-cloud-sdk-228.0.0-darwin-x86_64.tar.gz
 # ./google-cloud-sdk/install.sh # 선택사항으로 특정 경로에 sdk 를 추가할때
 export PATH=$PATH:~/workspace/google-cloud-sdk/bin
 gcloud components install app-engine-go
 GO111MODULE=on go get -u google.golang.org/appengine/...
+
+# gcloud 설치 - ubuntu
+export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)"
+echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+sudo apt-get update && sudo apt-get install google-cloud-sdk
+sudo apt-get install google-cloud-sdk-app-engine-python google-cloud-sdk-app-engine-go google-cloud-sdk-datastore-emulator
+
 
 # log
 https://cloud.google.com/appengine/docs/standard/go/logs/
@@ -61,8 +70,9 @@ https://cloud.google.com/appengine/docs/standard/go/config/cron
 https://cloud.google.com/appengine/docs/standard/go/config/appref
 
 
+export GO111MODULE=on
 # google cloud 올리기전에 로컬에서 테스트 해볼 수 있다.
-# 아래 명령을 실행해두면 .go 소스 수정때마다 자동 빌드되어 된다.
+# 아래 명령을 실행해두면 .go 소스 수정때마다 자동 빌드 된다.
 dev_appserver.py app.yaml --port 9999
 
 # google cloud 초기화
@@ -71,7 +81,7 @@ dev_appserver.py app.yaml --port 9999
 # Compute Region and Zone 선택
 gcloud init
 
-# glcoud  구글 app engine 에 배포하기
+# glcoud 구글 app engine 에 배포하기
 # 배포 종료시 접속 가능한 url 이 표시된다.
 # 배포전 아래 내용이 출력된다. 이상이 있다면 gcloud init 로 다시 설정하자.
 # descriptor:      [/Users/ysoftman/workspace/watchDust/app.yaml]
@@ -82,7 +92,7 @@ gcloud init
 # target url:      [https://watchdust.appspot.com]
 # --verion 버전 명시
 # --promote 현재 배포한 버전이 모든 트랙픽(100%)을 받도록 한다. 기존 버전의 인스턴스는 트랙픽 0% 이 된다.
-gcloud app deploy ./app.yaml --version 20190416 --promote
+GO111MODULE=on gcloud app deploy ./app.yaml --version 20200206 --promote
 
 # 크론 작업 cron.yaml
 gcloud app deploy cron.yaml
