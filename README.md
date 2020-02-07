@@ -75,6 +75,9 @@ export GO111MODULE=on
 # 아래 명령을 실행해두면 .go 소스 수정때마다 자동 빌드 된다.
 dev_appserver.py app.yaml --port 9999
 
+# gcloud 인증(브라우저 열리고 로그인)
+gcloud auth login
+
 # google cloud 초기화
 # url 링크 후 verification code 확인하여 입력
 # 기존 프로젝트 또는 신규 프로젝트 생성 선택
