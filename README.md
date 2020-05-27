@@ -7,6 +7,7 @@
     - 실시간 정보 : 10분(매 시간 시간자료 갱신은 20분 전후로 반영됨)
     - 대기질 예보 정보 : 매 시간 22분, 57분
   - airkorea 지역명 검색 : <https://www.airkorea.or.kr/web/realSearch>
+  - data.go.kr 로그인해서 활용기간 2년씩 연장 필요 <https://www.data.go.kr/iim/api/selectAPIAcountView.do>
   - 사용예
 
   ```bash
