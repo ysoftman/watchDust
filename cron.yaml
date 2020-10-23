@@ -3,7 +3,7 @@ cron:
   url: /watchDust?slack=dustinfo
   # schedule: every 24 hours
   # schedule: every 5 minutes from 09:00 to 21:00
-  schedule: every 3 hours from 09:00 to 21:00
+  schedule: every 3 hours from 09:30 to 21:30
   # schedule: every 1 mins
   # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
   # timezone: Australia/NSW
