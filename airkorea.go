@@ -17,7 +17,7 @@ import (
 func GetEncURL(str string) string {
 	t := &url.URL{Path: str}
 	encurl := t.String()
-	fmt.Printf("encode url(%s) = %s\n", str, encurl)
+	fmt.Printf("encode url %s => %s\n", str, encurl)
 	return encurl
 }
 
@@ -46,6 +46,7 @@ func openapiAirKoreaGAE(r *http.Request, stationName string) *dustinfoResp {
 	resp, err := client.Get(url)
 	if err != nil {
 		log.Println(err.Error())
+		return &dustinfoResp{}
 	}
 	defer resp.Body.Close()
 
@@ -54,6 +55,7 @@ func openapiAirKoreaGAE(r *http.Request, stationName string) *dustinfoResp {
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Println("can't read resp.Body")
+		return &dustinfoResp{}
 	}
 	bodystring := string(body)
 	log.Println(bodystring)
@@ -69,6 +71,7 @@ func openapiAirKorea(stationName string) *dustinfoResp {
 	resp, err := http.Get(url)
 	if err != nil {
 		log.Println(err.Error())
+		return &dustinfoResp{}
 	}
 	defer resp.Body.Close()
 
@@ -77,6 +80,7 @@ func openapiAirKorea(stationName string) *dustinfoResp {
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Println("can't read resp.Body")
+		return &dustinfoResp{}
 	}
 	bodystring := string(body)
 	log.Println(bodystring)
