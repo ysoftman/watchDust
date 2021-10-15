@@ -41,7 +41,14 @@ go get github.com/PuerkitoBio/goquery
 go build
 
 # execute
+# default:gae(google app engin) 환경
 ./watchdust
+
+# 일반 서버 환경
+./watchdust -servertype normal
+
+# 테스트로 한번 실행하고 종료
+./watchdust -servertype test
 ```
 
 ## google app engine 사용

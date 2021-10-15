@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -14,18 +15,20 @@ import (
 	appenginelog "google.golang.org/appengine/log"
 )
 
+const configFileName = "watchDustConfig.toml"
+
 var fineDustMsg = ""
 
 var conf serverConfig
 
 func loadConfig() {
 	// 파일로 부터 파싱해서 conf 로 저장하기
-	_, err := toml.DecodeFile("watchDustConfig.toml", &conf)
+	_, err := toml.DecodeFile(configFileName, &conf)
 	if err != nil {
 		log.Println(err)
 		os.Exit(1)
 	}
-	log.Printf("%v\n", conf)
+	log.Printf("%v was loaded\n%v\n", configFileName, conf)
 }
 
 func main() {
@@ -41,13 +44,24 @@ func main() {
 	// defer f.Close()
 	// log.SetOutput(f)
 	// log.Println("start Watch-Dust")
-	// 일반 서버 환경으로 운영시
-	// watchingDust()
 
-	// GAE(google app engine) 환경
-	http.HandleFunc("/", handlerIndex)
-	http.HandleFunc("/watchDust", handlerWatchingDust)
-	appengine.Main()
+	serverType := flag.String("servertype", "gae", "test|noraml|gae(google app engin)")
+	flag.Parse()
+	log.Println("servertype :", *serverType)
+	if *serverType == "test" {
+		// 연결 확인만 하고 종료
+		airReuslt := openapiAirKorea("")
+		dustinfomsg := analDustInfo(airReuslt, "")
+		log.Println(dustinfomsg)
+	} else if *serverType == "normal" {
+		// 일반 서버 환경으로 운영시
+		watchingDust()
+	} else if *serverType == "gae" {
+		// GAE(google app engine) 환경으로 운영시
+		http.HandleFunc("/", handlerIndex)
+		http.HandleFunc("/watchDust", handlerWatchingDust)
+		appengine.Main()
+	}
 }
 
 func handlerIndex(w http.ResponseWriter, r *http.Request) {
@@ -121,7 +135,7 @@ func watchingDust() {
 	// every minute
 	// c.AddFunc("0 */1 * * * *", func() { analDustInfo(openapiAirKorea()) })
 	// c.AddFunc("@hourly", func() { fmt.Println("Every hour") })
-	// 9~21시 사이 n 시 간격으로 => 9 12 15 18 21시
+	// 9-21/3 : 9~21시 사이 3시간 간격으로 => 9 12 15 18 21시
 	c.AddFunc("0 0 9-21/"+strconv.Itoa(conf.WatchIntervalHour)+" * * *", func() {
 		airReuslt := openapiAirKorea("")
 		dustinfomsg := analDustInfo(airReuslt, "")
