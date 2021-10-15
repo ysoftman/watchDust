@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"time"
 
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/urlfetch"
@@ -43,6 +44,7 @@ func openapiAirKoreaGAE(r *http.Request, stationName string) *dustinfoResp {
 	// resp, err := http.Get(url)
 	ctx := appengine.NewContext(r)
 	client := urlfetch.Client(ctx)
+	client.Timeout = time.Second * 3
 	resp, err := client.Get(url)
 	if err != nil {
 		log.Println(err.Error())
@@ -67,8 +69,11 @@ func openapiAirKoreaGAE(r *http.Request, stationName string) *dustinfoResp {
 
 // 공공데이터 airkorea 로 부터 미세먼지 정보 파악
 func openapiAirKorea(stationName string) *dustinfoResp {
+	client := http.Client{
+		Timeout: time.Second * 3,
+	}
 	url := getAirKoreaURL(stationName)
-	resp, err := http.Get(url)
+	resp, err := client.Get(url)
 	if err != nil {
 		log.Println(err.Error())
 		return &dustinfoResp{}

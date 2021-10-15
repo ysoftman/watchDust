@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/urlfetch"
@@ -31,6 +32,7 @@ func sendToSlackGAE(r *http.Request, slackchannel, msg string) {
 	// resp, err := http.Post("https://slack.com/api/chat.postMessage", "application/x-www-form-urlencoded", reqBody)
 	ctx := appengine.NewContext(r)
 	client := urlfetch.Client(ctx)
+	client.Timeout = time.Second * 3
 	resp, err := client.Post("https://slack.com/api/chat.postMessage", "application/x-www-form-urlencoded", reqBody)
 	if err != nil {
 		log.Println(err.Error())
@@ -54,7 +56,10 @@ func sendToSlackGAE(r *http.Request, slackchannel, msg string) {
 func sendToSlack(slackchannel, msg string) {
 	content := getSlackURL(slackchannel, msg)
 	reqBody := bytes.NewBufferString(content)
-	resp, err := http.Post("https://slack.com/api/chat.postMessage", "application/x-www-form-urlencoded", reqBody)
+	client := http.Client{
+		Timeout: time.Second * 3,
+	}
+	resp, err := client.Post("https://slack.com/api/chat.postMessage", "application/x-www-form-urlencoded", reqBody)
 	if err != nil {
 		log.Println(err)
 		return
