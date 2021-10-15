@@ -51,8 +51,7 @@ func main() {
 	if *serverType == "test" {
 		// 연결 확인만 하고 종료
 		airReuslt := openapiAirKorea("")
-		dustinfomsg := analDustInfo(airReuslt, "")
-		log.Println(dustinfomsg)
+		analDustInfo(airReuslt, "")
 	} else if *serverType == "normal" {
 		// 일반 서버 환경으로 운영시
 		watchingDust()
@@ -71,19 +70,13 @@ func handlerIndex(w http.ResponseWriter, r *http.Request) {
 디폴트 측정소 미세먼지 정보
 https://watchdust.appspot.com/watchDust
 
-수내동 측정소 미세먼지 정보
-https://watchdust.appspot.com/watchDust?station=대왕판교로(백현동)
-https://watchdust.appspot.com/watchDust?station=수내동
-https://watchdust.appspot.com/watchDust?station=정자동
-https://watchdust.appspot.com/watchDust?station=강남대로
-
 dustinfo 슬랙 채널에 미세먼지 정보 발송
-https://watchdust.appspot.com/watchDust?station=대왕판교로(백현동)&slack=dustinfo
-https://watchdust.appspot.com/watchDust?station=수내동&slack=dustinfo
-https://watchdust.appspot.com/watchDust?station=정자동&slack=dustinfo
-https://watchdust.appspot.com/watchDust?station=강남대로&slack=dustinfo
+https://watchdust.appspot.com/watchDust?slack=dustinfo
+https://watchdust.appspot.com/watchDust?slack=dustinfo
+https://watchdust.appspot.com/watchDust?slack=dustinfo
+https://watchdust.appspot.com/watchDust?slack=dustinfo
 
-측정소(station) 이름
+측정소(station) 정보 참고
 https://www.airkorea.or.kr/web/stationInfo
 https://www.airkorea.or.kr/web/realSearch
 

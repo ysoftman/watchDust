@@ -23,17 +23,13 @@ func GetEncURL(str string) string {
 }
 
 func getAirKoreaURL(stationName string) string {
-	sn := conf.OpenapiAirkorea.StationName
-	if len(stationName) > 0 {
-		sn = stationName
-	}
-	return "http://openapi.airkorea.or.kr/openapi/services/rest/ArpltnInforInqireSvc/getMsrstnAcctoRltmMesureDnsty?numOfRows=" + strconv.Itoa(conf.OpenapiAirkorea.NumOfRows) +
+	airKoreaURL := conf.OpenapiAirkorea.URL + "?numOfRows=" + strconv.Itoa(conf.OpenapiAirkorea.NumOfRows) +
 		"&pageNo=" + strconv.Itoa(conf.OpenapiAirkorea.PageNo) +
-		"&stationName=" + GetEncURL(sn) +
-		"&dataTerm=" + conf.OpenapiAirkorea.DataTerm +
-		"&ver=" + conf.OpenapiAirkorea.Ver +
-		"&_returnType=json" +
+		"&searchDate=" + time.Now().Local().Format("2006-01-02") +
+		"&returnType=json" +
 		"&serviceKey=" + conf.OpenapiAirkorea.Servicekey
+	fmt.Println("airKoreaURL:", airKoreaURL)
+	return airKoreaURL
 }
 
 func openapiAirKoreaGAE(r *http.Request, stationName string) *dustinfoResp {
@@ -59,8 +55,8 @@ func openapiAirKoreaGAE(r *http.Request, stationName string) *dustinfoResp {
 		log.Println("can't read resp.Body")
 		return &dustinfoResp{}
 	}
-	bodystring := string(body)
-	log.Println(bodystring)
+	// bodystring := string(body)
+	// log.Println(bodystring)
 	jsonDustInfo := &dustinfoResp{}
 	json.Unmarshal([]byte(body), &jsonDustInfo)
 
@@ -87,8 +83,8 @@ func openapiAirKorea(stationName string) *dustinfoResp {
 		log.Println("can't read resp.Body")
 		return &dustinfoResp{}
 	}
-	bodystring := string(body)
-	log.Println(bodystring)
+	// bodystring := string(body)
+	// log.Println(jsonDustInfo)
 	jsonDustInfo := &dustinfoResp{}
 	json.Unmarshal([]byte(body), &jsonDustInfo)
 

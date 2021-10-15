@@ -11,7 +11,7 @@
   - 사용예
 
   ```bash
-  http://openapi.airkorea.or.kr/openapi/services/rest/ArpltnInforInqireSvc/getMsrstnAcctoRltmMesureDnsty?numOfRows=10&pageNo=1&stationName=수내동&dataTerm=DAILY&ver=1.3&_returnType=json&serviceKey=aaaaa
+  http://apis.data.go.kr/B552584/ArpltnInforInqireSvc/getMinuDustFrcstDspth?numOfRows=4&pageNo=1&searchDate=2021-10-15&returnType=json&serviceKey=aaa
   ```
 
 - slack 알림
@@ -103,7 +103,8 @@ gcloud init
 # target url:      [https://watchdust.appspot.com]
 # --verion 버전 명시
 # --promote 현재 배포한 버전이 모든 트랙픽(100%)을 받도록 한다. 기존 버전의 인스턴스는 트랙픽 0% 이 된다.
-GO111MODULE=on gcloud app deploy ./app.yaml --version 20200206 --promote
+# --stop-previous-version 새버전이 올라가면 기존 버전은 stop 하도록 한다.
+GO111MODULE=on gcloud app deploy ./app.yaml --version 20211015-2 --promote --stop-previous-version
 
 # 크론 작업 cron.yaml
 gcloud app deploy cron.yaml
