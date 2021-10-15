@@ -72,9 +72,6 @@ https://watchdust.appspot.com/watchDust
 
 dustinfo 슬랙 채널에 미세먼지 정보 발송
 https://watchdust.appspot.com/watchDust?slack=dustinfo
-https://watchdust.appspot.com/watchDust?slack=dustinfo
-https://watchdust.appspot.com/watchDust?slack=dustinfo
-https://watchdust.appspot.com/watchDust?slack=dustinfo
 
 측정소(station) 정보 참고
 https://www.airkorea.or.kr/web/stationInfo
