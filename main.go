@@ -11,8 +11,9 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/robfig/cron"
-	"google.golang.org/appengine"
-	appenginelog "google.golang.org/appengine/log"
+	"google.golang.org/appengine/v2"
+
+	appenginelog "google.golang.org/appengine/v2/log"
 )
 
 const configFileName = "watchDustConfig.toml"
@@ -36,7 +37,7 @@ func main() {
 
 	// 20190406 google compute engine 무료 기간 만료
 	// App Engine에서 애플리케이션이 배포되어 있는 로컬 파일 시스템은 쓸 수 없습니다.
-	// google.golang.org/appengine/log 으로 로깅 가능하다.
+	// google.golang.org/appengine/v2/log 으로 로깅 가능하다.
 	// f, err := os.OpenFile("wd.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	// if err != nil {
 	// 	log.Fatal("can't open log file")

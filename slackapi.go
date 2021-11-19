@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"time"
 
-	"google.golang.org/appengine"
-	"google.golang.org/appengine/urlfetch"
+	"google.golang.org/appengine/v2"
+	"google.golang.org/appengine/v2/urlfetch"
 )
 
 func getSlackURL(slackchannel, msg string) string {
@@ -27,7 +27,7 @@ func sendToSlackGAE(r *http.Request, slackchannel, msg string) {
 	reqBody := bytes.NewBufferString(content)
 
 	// appengine 에서는 기본 http client 를 할 수 없다.
-	// google.golang.org/appengine/urlfetch 를 사용해야 하나.
+	// google.golang.org/appengine/v2/urlfetch 를 사용해야 하나.
 	// http.DefaultTransport and http.DefaultClient are not available in App Engine. See https://cloud.google.com/appengine/docs/go/urlfetch/
 	// resp, err := http.Post("https://slack.com/api/chat.postMessage", "application/x-www-form-urlencoded", reqBody)
 	ctx := appengine.NewContext(r)

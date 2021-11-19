@@ -10,8 +10,8 @@ import (
 	"strconv"
 	"time"
 
-	"google.golang.org/appengine"
-	"google.golang.org/appengine/urlfetch"
+	"google.golang.org/appengine/v2"
+	"google.golang.org/appengine/v2/urlfetch"
 )
 
 // GetEncURL : URL 인코딩
@@ -35,7 +35,7 @@ func getAirKoreaURL(stationName string) string {
 func openapiAirKoreaGAE(r *http.Request, stationName string) *dustinfoResp {
 	url := getAirKoreaURL(stationName)
 	// appengine 에서는 기본 http client 를 할 수 없다.
-	// google.golang.org/appengine/urlfetch 를 사용해야 하나.
+	// google.golang.org/appengine/v2/urlfetch 를 사용해야 하나.
 	// http.DefaultTransport and http.DefaultClient are not available in App Engine. See https://cloud.google.com/appengine/docs/go/urlfetch/
 	// resp, err := http.Get(url)
 	ctx := appengine.NewContext(r)

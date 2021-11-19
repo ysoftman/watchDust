@@ -2,7 +2,8 @@
 
 ## References
 
-- data 공공포털 openapi 한국환경공단_대기오염정보 조회 서비스(airkorea)
+- data 공공포털 openapi 한국환경공단 대기오염정보 조회 서비스(airkorea)
+
   - 데이터 갱신 주기
     - 실시간 정보 : 10분(매 시간 시간자료 갱신은 20분 전후로 반영됨)
     - 대기질 예보 정보 : 매 시간 22분, 57분
@@ -15,6 +16,7 @@
   ```
 
 - slack 알림
+
   - 채널 메시지 보내기 api : <https://api.slack.com/methods/chat.postMessage>
   - 토근 발급 : <https://api.slack.com/custom-integrations/legacy-tokens>
   - 사용예
@@ -36,6 +38,7 @@
 go get github.com/BurntSushi/toml
 go get github.com/robfig/cron
 go get github.com/PuerkitoBio/goquery
+go get google.golang.org/appengine/v2
 
 # build
 go build
@@ -55,12 +58,14 @@ go build
 
 ```bash
 # gcloud 설치 - mac
-wget https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-228.0.0-darwin-x86_64.tar.gz
-tar zxvf google-cloud-sdk-228.0.0-darwin-x86_64.tar.gz
-# ./google-cloud-sdk/install.sh # 선택사항으로 특정 경로에 sdk 를 추가할때
-export PATH=$PATH:~/workspace/google-cloud-sdk/bin
+brew install google-cloud-sdk
+# 또는 수동 설치
+cd ~/workspace
+wget https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-365.0.0-darwin-x86_64.tar.gz
+rm -rf google-cloud-sdk
+tar zxvf google-cloud-sdk-365.0.0-darwin-x86_64.tar.gz
+# 컴포넌트 설치, golang 패키지 설치
 gcloud components install app-engine-go
-GO111MODULE=on go get -u google.golang.org/appengine/...
 
 # gcloud 설치 - ubuntu
 export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)"
@@ -78,13 +83,15 @@ https://cloud.google.com/appengine/docs/standard/go/config/cron
 https://cloud.google.com/appengine/docs/standard/go/config/appref
 
 
-export GO111MODULE=on
 # google cloud 올리기전에 로컬에서 테스트 해볼 수 있다.
 # 아래 명령을 실행해두면 .go 소스 수정때마다 자동 빌드 된다.
-dev_appserver.py app.yaml --port 9999
+# google-cloud-sdk.tar.gz 로 설치했을 경우
+~/workspace/google-cloud-sdk/bin/dev_appserver.py app.yaml --port 9999
 
 # gcloud 인증(브라우저 열리고 로그인)
-gcloud auth login
+# gcloud auth login
+# appengine/v2 (runtime: go116) 을 배포하기 위해선 현재 beta 를 사용해야 한다.
+gcloud beta auth login
 
 # google cloud 초기화
 # url 링크 후 verification code 확인하여 입력
@@ -104,7 +111,9 @@ gcloud init
 # --verion 버전 명시
 # --promote 현재 배포한 버전이 모든 트랙픽(100%)을 받도록 한다. 기존 버전의 인스턴스는 트랙픽 0% 이 된다.
 # --stop-previous-version 새버전이 올라가면 기존 버전은 stop 하도록 한다.
-GO111MODULE=on gcloud app deploy ./app.yaml --version 20211015-2 --promote --stop-previous-version
+# gcloud app deploy ./app.yaml --version 20211119-1 --promote --stop-previous-version
+# appengine/v2 (runtime: go116) 을 배포하기 위해선 현재 beta 를 사용해야 한다.
+gcloud beta app deploy ./app.yaml --version 20211119-1 --promote --stop-previous-version
 
 # 크론 작업 cron.yaml
 gcloud app deploy cron.yaml
