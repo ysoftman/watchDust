@@ -22,20 +22,20 @@ func GetEncURL(str string) string {
 	return encurl
 }
 
-func getAirKoreaURL(stationName string) string {
+func getAirKoreaURL() string {
 	airKoreaURL := conf.OpenapiAirkorea.URL + "?numOfRows=" + strconv.Itoa(conf.OpenapiAirkorea.NumOfRows) +
 		"&pageNo=" + strconv.Itoa(conf.OpenapiAirkorea.PageNo) +
-		"&searchDate=" + time.Now().Local().Format("2006-01-02") +
+		"&searchDate=" + time.Now().UTC().Format("2006-01-02") +
 		"&returnType=json" +
 		"&serviceKey=" + conf.OpenapiAirkorea.Servicekey
 	fmt.Println("airKoreaURL:", airKoreaURL)
 	return airKoreaURL
 }
 
-func openapiAirKoreaGAE(r *http.Request, stationName string) *dustinfoResp {
-	url := getAirKoreaURL(stationName)
+func openapiAirKoreaGAE(r *http.Request) *dustinfoResp {
+	url := getAirKoreaURL()
 	// appengine 에서는 기본 http client 를 할 수 없다.
-	// google.golang.org/appengine/v2/urlfetch 를 사용해야 하나.
+	// google.golang.org/appengine/v2/urlfetch 를 사용해야 한다.
 	// http.DefaultTransport and http.DefaultClient are not available in App Engine. See https://cloud.google.com/appengine/docs/go/urlfetch/
 	// resp, err := http.Get(url)
 	ctx := appengine.NewContext(r)
@@ -64,11 +64,11 @@ func openapiAirKoreaGAE(r *http.Request, stationName string) *dustinfoResp {
 }
 
 // 공공데이터 airkorea 로 부터 미세먼지 정보 파악
-func openapiAirKorea(stationName string) *dustinfoResp {
+func openapiAirKorea() *dustinfoResp {
 	client := http.Client{
 		Timeout: time.Second * 3,
 	}
-	url := getAirKoreaURL(stationName)
+	url := getAirKoreaURL()
 	resp, err := client.Get(url)
 	if err != nil {
 		log.Println(err.Error())

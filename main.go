@@ -51,8 +51,8 @@ func main() {
 	log.Println("servertype :", *serverType)
 	if *serverType == "test" {
 		// 연결 확인만 하고 종료
-		airReuslt := openapiAirKorea("")
-		analDustInfo(airReuslt, "")
+		airReuslt := openapiAirKorea()
+		analDustInfo(airReuslt)
 	} else if *serverType == "normal" {
 		// 일반 서버 환경으로 운영시
 		watchingDust()
@@ -68,15 +68,11 @@ func handlerIndex(w http.ResponseWriter, r *http.Request) {
 	ctx := appengine.NewContext(r)
 	appenginelog.Infof(ctx, "/ 요청 처리")
 	out := `
-디폴트 측정소 미세먼지 정보
+디폴트 미세먼지 정보
 https://watchdust.appspot.com/watchDust
 
 dustinfo 슬랙 채널에 미세먼지 정보 발송
 https://watchdust.appspot.com/watchDust?slack=dustinfo
-
-측정소(station) 정보 참고
-https://www.airkorea.or.kr/web/stationInfo
-https://www.airkorea.or.kr/web/realSearch
 
 github
 https://github.com/ysoftman/watchDust
@@ -89,9 +85,9 @@ func handlerWatchingDust(w http.ResponseWriter, r *http.Request) {
 	appenginelog.Infof(ctx, "/watchDust 요청 처리")
 	query := r.URL.Query()
 
-	log.Println("----------", query.Get("station"))
-	airResult := openapiAirKoreaGAE(r, query.Get("station"))
-	dustinfomsg := analDustInfo(airResult, query.Get("station"))
+	log.Println("---------- openapiAirKoreaGAE")
+	airResult := openapiAirKoreaGAE(r)
+	dustinfomsg := analDustInfo(airResult)
 	out := dustinfomsg
 
 	log.Println("----------", query.Get("slack"))
@@ -128,8 +124,8 @@ func watchingDust() {
 	// c.AddFunc("@hourly", func() { fmt.Println("Every hour") })
 	// 9-21/3 : 9~21시 사이 3시간 간격으로 => 9 12 15 18 21시
 	c.AddFunc("0 0 9-21/"+strconv.Itoa(conf.WatchIntervalHour)+" * * *", func() {
-		airReuslt := openapiAirKorea("")
-		dustinfomsg := analDustInfo(airReuslt, "")
+		airReuslt := openapiAirKorea()
+		dustinfomsg := analDustInfo(airReuslt)
 		sendToSlack(conf.SlackAPI.Channel, dustinfomsg)
 	})
 	c.Start()

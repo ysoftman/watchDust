@@ -113,7 +113,7 @@ gcloud init
 # --stop-previous-version 새버전이 올라가면 기존 버전은 stop 하도록 한다.
 # gcloud app deploy ./app.yaml --version 20211119-1 --promote --stop-previous-version
 # appengine/v2 (runtime: go116) 을 배포하기 위해선 현재 beta 를 사용해야 한다.
-gcloud beta app deploy ./app.yaml --version 20211119-1 --promote --stop-previous-version
+gcloud beta app deploy ./app.yaml --version 20211122-1 --promote --stop-previous-version
 
 # 크론 작업 cron.yaml
 gcloud app deploy cron.yaml
