@@ -4,9 +4,6 @@
 
 - data 공공포털 openapi 한국환경공단 대기오염정보 조회 서비스(airkorea)
 
-  - 데이터 갱신 주기
-    - 실시간 정보 : 10분(매 시간 시간자료 갱신은 20분 전후로 반영됨)
-    - 대기질 예보 정보 : 매 시간 22분, 57분
   - airkorea 지역명 검색 : <https://www.airkorea.or.kr/web/realSearch>
   - data.go.kr 로그인해서 활용기간 2년씩 연장 필요 <https://www.data.go.kr/iim/api/selectAPIAcountView.do>
   - 사용예
@@ -24,12 +21,6 @@
   ```bash
   curl -X POST https://slack.com/api/chat.postMessage -d "token=aaaaa&channel=dustinfo&username=watchDust bot&text=미세먼지 정보입니다."
   ```
-
-## Perequisite (watchDustConfig.toml)
-
-- openapi_airkorea.serverkey = <https://www.data.go.kr/subMain.jsp#/L3B1YnIvcG90L215cC9Jcm9zTXlQYWdlL29wZW5EZXZEZXRhaWxQYWdlJEBeMDgyTTAwMDAxMzBeTTAwMDAxMzUkQF5wdWJsaWNEYXRhRGV0YWlsUGs9dWRkaTo3MDkxMTBlNy1kN2IxLTQ0MjEtOTBiYS04NGE2OWY5ODBjYWJfMjAxNjA4MDgxMTE0JEBecHJjdXNlUmVxc3RTZXFObz0zODMzNDExJEBecmVxc3RTdGVwQ29kZT1TVENEMDE=>
-
-- slack_api.token = <https://api.slack.com/custom-integrations/legacy-tokens>
 
 ## 빌드 및 실행
 
