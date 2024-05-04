@@ -64,6 +64,11 @@ func main() {
 	}
 }
 
+func SetCommonResponseHeader(w http.ResponseWriter) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "get")
+}
+
 func handlerIndex(w http.ResponseWriter, r *http.Request) {
 	ctx := appengine.NewContext(r)
 	appenginelog.Infof(ctx, "/ 요청 처리")
@@ -77,6 +82,7 @@ https://watchdust.appspot.com/watchDust?slack=dustinfo
 github
 https://github.com/ysoftman/watchDust
 `
+	SetCommonResponseHeader(w)
 	fmt.Fprintln(w, out)
 }
 
@@ -95,6 +101,7 @@ func handlerWatchingDust(w http.ResponseWriter, r *http.Request) {
 		sendToSlackGAE(r, query.Get("slack"), dustinfomsg)
 		out += "slack channel = " + query.Get("slack")
 	}
+	SetCommonResponseHeader(w)
 	fmt.Fprintln(w, out)
 }
 

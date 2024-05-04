@@ -26,10 +26,7 @@
 
 ```bash
 # get packages
-go get github.com/BurntSushi/toml
-go get github.com/robfig/cron
-go get github.com/PuerkitoBio/goquery
-go get google.golang.org/appengine/v2
+go get ./...
 
 # build
 go build
@@ -65,14 +62,8 @@ curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
 sudo apt-get update && sudo apt-get install google-cloud-sdk
 sudo apt-get install google-cloud-sdk-app-engine-python google-cloud-sdk-app-engine-go google-cloud-sdk-datastore-emulator
 
-
-# log
-https://cloud.google.com/appengine/docs/standard/go/logs/
-# cron.yaml
-https://cloud.google.com/appengine/docs/standard/go/config/cron
-# app.yaml
-https://cloud.google.com/appengine/docs/standard/go/config/appref
-
+# docs
+https://cloud.google.com/appengine/docs/
 
 # google cloud 올리기전에 로컬에서 테스트 해볼 수 있다.
 # 아래 명령을 실행해두면 .go 소스 수정때마다 자동 빌드 된다.
@@ -102,9 +93,7 @@ gcloud init
 # --verion 버전 명시
 # --promote 현재 배포한 버전이 모든 트랙픽(100%)을 받도록 한다. 기존 버전의 인스턴스는 트랙픽 0% 이 된다.
 # --stop-previous-version 새버전이 올라가면 기존 버전은 stop 하도록 한다.
-# gcloud app deploy ./app.yaml --version 20211119-1 --promote --stop-previous-version
-# appengine/v2 (runtime: go116) 을 배포하기 위해선 현재 beta 를 사용해야 한다.
-gcloud beta app deploy ./app.yaml --version 20211122-1 --promote --stop-previous-version
+gcloud app deploy ./app.yaml --version 20240504-1 --promote --stop-previous-version
 
 # 크론 작업 cron.yaml
 gcloud app deploy cron.yaml
