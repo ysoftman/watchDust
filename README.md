@@ -77,9 +77,7 @@ https://cloud.google.com/appengine/docs/
 ~/workspace/google-cloud-sdk/bin/dev_appserver.py app.yaml --port 9999
 
 # gcloud 인증(브라우저 열리고 로그인)
-# gcloud auth login
-# appengine/v2 (runtime: go116) 을 배포하기 위해선 현재 beta 를 사용해야 한다.
-gcloud beta auth login
+gcloud auth login
 
 # google cloud 초기화
 # url 링크 후 verification code 확인하여 입력
@@ -103,18 +101,16 @@ gcloud config set project watchdust
 # --verion 버전 명시
 # --promote 현재 배포한 버전이 모든 트랙픽(100%)을 받도록 한다. 기존 버전의 인스턴스는 트랙픽 0% 이 된다.
 # --stop-previous-version 새버전이 올라가면 기존 버전은 stop 하도록 한다.
-gcloud app deploy ./app.yaml --version 20240504-1 --promote --stop-previous-version
+gcloud app deploy ./app.yaml --version 20250402-1 --promote --stop-previous-version
 
 # 크론 작업 cron.yaml
 gcloud app deploy cron.yaml
 
-# 배포가 완료되면 확인
-https://watchdust.appspot.com
-
 # 배포 후 접속 URL 확인 하기
 gcloud app browse
+https://watchdust.appspot.com
 
 # 앱 로그 확인
-https://console.cloud.google.com/logs/viewer?project=watchdust
 gcloud app logs tail -s default
+https://console.cloud.google.com/logs/viewer?project=watchdust
 ```
