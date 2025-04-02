@@ -98,10 +98,10 @@ gcloud config set project watchdust
 # target service:  [default]
 # target version:  [20190416t141405]
 # target url:      [https://watchdust.appspot.com]
-# --verion 버전 명시
+# --version 버전 명시
 # --promote 현재 배포한 버전이 모든 트랙픽(100%)을 받도록 한다. 기존 버전의 인스턴스는 트랙픽 0% 이 된다.
 # --stop-previous-version 새버전이 올라가면 기존 버전은 stop 하도록 한다.
-gcloud app deploy ./app.yaml --version 20250402-1 --promote --stop-previous-version
+gcloud app deploy ./app.yaml --version 20250402-2 --promote --stop-previous-version
 
 # 크론 작업 cron.yaml
 gcloud app deploy cron.yaml

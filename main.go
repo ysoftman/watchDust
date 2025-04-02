@@ -49,14 +49,14 @@ func main() {
 	// log.SetOutput(f)
 	// log.Println("start Watch-Dust")
 
-	serverType := flag.String("servertype", "gae", "test|noraml|gae(google app engin)")
+	serverType := flag.String("servertype", "gae", "test|normal|gae(google app engin)")
 	flag.Parse()
 	log.Println("servertype :", *serverType)
 	switch *serverType {
 	case "test":
 		// 연결 확인만 하고 종료
-		airReuslt := openapiAirKorea()
-		analDustInfo(airReuslt)
+		airResult := openapiAirKorea()
+		analDustInfo(airResult)
 	case "normal":
 		// 일반 서버 환경으로 운영시
 		watchingDust()
@@ -135,8 +135,8 @@ func watchingDust() {
 	// c.AddFunc("@hourly", func() { fmt.Println("Every hour") })
 	// 9-21/3 : 9~21시 사이 3시간 간격으로 => 9 12 15 18 21시
 	c.AddFunc("0 0 9-21/"+strconv.Itoa(conf.WatchIntervalHour)+" * * *", func() {
-		airReuslt := openapiAirKorea()
-		dustinfomsg := analDustInfo(airReuslt)
+		airResult := openapiAirKorea()
+		dustinfomsg := analDustInfo(airResult)
 		sendToSlack(conf.SlackAPI.Channel, dustinfomsg)
 	})
 	c.Start()
