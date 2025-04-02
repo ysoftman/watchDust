@@ -35,11 +35,17 @@ go build
 # default:gae(google app engin) 환경
 ./watchdust
 
+# 로컬에서 환경변수로 테스트할때 사용할 파일 생성
+cat << zzz > .env
+export WATCHDUST_OPENAPIAIRKOREA_SERVICE_KEY=""
+export WATCHDUST_SLACKAPI_TOKEN=""
+zzz
+
 # 일반 서버 환경
-./watchdust -servertype normal
+go build && . .env && ./watchdust -servertype normal
 
 # 테스트로 한번 실행하고 종료
-./watchdust -servertype test
+go build && . .env && ./watchdust -servertype test
 ```
 
 ## google app engine 사용

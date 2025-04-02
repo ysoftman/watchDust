@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"time"
 
 	"github.com/BurntSushi/toml"
+	"github.com/caarlos0/env/v11"
 	"github.com/robfig/cron"
 	"google.golang.org/appengine/v2"
 
@@ -18,18 +18,21 @@ import (
 
 const configFileName = "watchDustConfig.toml"
 
-var fineDustMsg = ""
-
-var conf serverConfig
+var (
+	fineDustMsg = ""
+	conf        serverConfig
+)
 
 func loadConfig() {
-	// 파일로 부터 파싱해서 conf 로 저장하기
-	_, err := toml.DecodeFile(configFileName, &conf)
-	if err != nil {
+	if _, err := toml.DecodeFile(configFileName, &conf); err != nil {
 		log.Println(err)
 		os.Exit(1)
 	}
-	log.Printf("%v was loaded\n%v\n", configFileName, conf)
+	if err := env.Parse(&conf); err != nil {
+		log.Println(err)
+		os.Exit(2)
+	}
+	log.Printf("%v was loaded\n%+v\n", configFileName, conf)
 }
 
 func main() {
@@ -49,14 +52,15 @@ func main() {
 	serverType := flag.String("servertype", "gae", "test|noraml|gae(google app engin)")
 	flag.Parse()
 	log.Println("servertype :", *serverType)
-	if *serverType == "test" {
+	switch *serverType {
+	case "test":
 		// 연결 확인만 하고 종료
 		airReuslt := openapiAirKorea()
 		analDustInfo(airReuslt)
-	} else if *serverType == "normal" {
+	case "normal":
 		// 일반 서버 환경으로 운영시
 		watchingDust()
-	} else if *serverType == "gae" {
+	case "gae":
 		// GAE(google app engine) 환경으로 운영시
 		http.HandleFunc("/", handlerIndex)
 		http.HandleFunc("/watchDust", handlerWatchingDust)
@@ -136,9 +140,10 @@ func watchingDust() {
 		sendToSlack(conf.SlackAPI.Channel, dustinfomsg)
 	})
 	c.Start()
-	for {
-		select {
-		case <-time.After(10 * time.Second):
-		}
-	}
+	select {}
+	// for {
+	// 	select {
+	// 	case <-time.After(10 * time.Second):
+	// 	}
+	// }
 }

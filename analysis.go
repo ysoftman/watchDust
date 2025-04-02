@@ -22,9 +22,10 @@ func analDustInfo(jsonDustInfo *dustinfoResp) string {
 		if markedCode[val.InformCode] {
 			continue
 		}
-		if val.InformCode == "PM10" {
+		switch val.InformCode {
+		case "PM10":
 			imageURL = val.ImageURL1
-		} else if val.InformCode == "PM25" {
+		case "PM25":
 			imageURL = val.ImageURL4
 		}
 

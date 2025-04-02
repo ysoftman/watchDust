@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"net/url"
@@ -49,8 +49,8 @@ func openapiAirKoreaGAE(r *http.Request) *dustinfoResp {
 	defer resp.Body.Close()
 
 	// 응답결과 출력
-	// ioutil.ReadAll 로 resp.Body 읽고 나면 resp.Body 내용은 사라진다.
-	body, err := ioutil.ReadAll(resp.Body)
+	// io.ReadAll 로 resp.Body 읽고 나면 resp.Body 내용은 사라진다.
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Println("can't read resp.Body")
 		return &dustinfoResp{}
@@ -77,8 +77,8 @@ func openapiAirKorea() *dustinfoResp {
 	defer resp.Body.Close()
 
 	// 응답결과 출력
-	// ioutil.ReadAll 로 resp.Body 읽고 나면 resp.Body 내용은 사라진다.
-	body, err := ioutil.ReadAll(resp.Body)
+	// io.ReadAll 로 resp.Body 읽고 나면 resp.Body 내용은 사라진다.
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Println("can't read resp.Body")
 		return &dustinfoResp{}

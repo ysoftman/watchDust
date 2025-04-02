@@ -2,7 +2,7 @@ package main
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"time"
@@ -45,7 +45,7 @@ func sendToSlackGAE(r *http.Request, slackchannel, msg string) {
 	}
 	defer resp.Body.Close()
 
-	respBody, err := ioutil.ReadAll(resp.Body)
+	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Println(err)
 	} else {
@@ -66,7 +66,7 @@ func sendToSlack(slackchannel, msg string) {
 	}
 	defer resp.Body.Close()
 
-	respBody, err := ioutil.ReadAll(resp.Body)
+	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Println(err)
 	} else {
