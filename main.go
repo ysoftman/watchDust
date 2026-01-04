@@ -125,8 +125,8 @@ func handlerWatchingDust(w http.ResponseWriter, r *http.Request) {
 	dustinfomsg := analDustInfo(airResult)
 	out := dustinfomsg
 
-	log.Println("---------- slack channel:", query.Get("slack"))
 	if len(query.Get("slack")) > 0 {
+		log.Println("---------- slack channel:", query.Get("slack"))
 		out += "slack channel = " + query.Get("slack")
 		err, respMsg := slack(r, query.Get("slack"), dustinfomsg)
 		if err != nil {
