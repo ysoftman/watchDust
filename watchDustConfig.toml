@@ -3,6 +3,9 @@ Title = "Watch Dust"
 # 미세먼지 파악(알림) 간격
 WatchIntervalHour = 3
 
+# 일반 서버로 동작시 포트
+Port = 8080
+
 [openapi_airkorea]
 url = "http://apis.data.go.kr/B552584/ArpltnInforInqireSvc/getMinuDustFrcstDspth"
 # 서비스키
@@ -16,7 +19,5 @@ pageNo = 1
 [slack_api]
 # 토큰
 token = ""
-# 메시지 보낼 (디폴트)채널
-channel = "dustinfo"
 # 봇이름
 username = "watchDust bot"

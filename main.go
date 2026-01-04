@@ -19,7 +19,10 @@ import (
 const configFileName = "watchDustConfig.toml"
 
 // fineDustMsg = ""
-var conf serverConfig
+var (
+	conf  serverConfig
+	isGAE bool
+)
 
 func loadConfig() {
 	if _, err := toml.DecodeFile(configFileName, &conf); err != nil {
@@ -49,19 +52,20 @@ func main() {
 
 	serverType := flag.String("servertype", "gae", "test|normal|gae(google app engin)")
 	flag.Parse()
+	isGAE = (*serverType == "gae")
 	log.Println("servertype :", *serverType)
+	http.HandleFunc("/", handlerIndex)
+	http.HandleFunc("/watchDust", handlerWatchingDust)
 	switch *serverType {
-	case "test":
-		// 연결 확인만 하고 종료
-		airResult := openapiAirKorea()
-		analDustInfo(airResult)
 	case "normal":
 		// 일반 서버 환경으로 운영시
-		watchingDust()
+		go cronWatchingDust()
+		log.Printf("Starting HTTP server on port %d\n", conf.Port)
+		if err := http.ListenAndServe(fmt.Sprintf(":%d", conf.Port), nil); err != nil {
+			log.Fatal(err)
+		}
 	case "gae":
 		// GAE(google app engine) 환경으로 운영시
-		http.HandleFunc("/", handlerIndex)
-		http.HandleFunc("/watchDust", handlerWatchingDust)
 		appengine.Main()
 	}
 }
@@ -71,9 +75,31 @@ func SetCommonResponseHeader(w http.ResponseWriter) {
 	w.Header().Set("Access-Control-Allow-Methods", "get")
 }
 
+func logInfo(r *http.Request, msg string) {
+	if isGAE {
+		ctx := appengine.NewContext(r)
+		appenginelog.Infof(ctx, msg)
+	} else {
+		log.Println(msg)
+	}
+}
+
+func airKorea(r *http.Request) *dustinfoResp {
+	if isGAE {
+		return openapiAirKoreaGAE(r)
+	}
+	return openapiAirKorea()
+}
+
+func slack(r *http.Request, channel, msg string) (error, string) {
+	if isGAE {
+		return sendToSlackGAE(r, channel, msg)
+	}
+	return sendToSlack(channel, msg)
+}
+
 func handlerIndex(w http.ResponseWriter, r *http.Request) {
-	ctx := appengine.NewContext(r)
-	appenginelog.Infof(ctx, "/ 요청 처리")
+	logInfo(r, "/ 요청 처리")
 	out := `
 디폴트 미세먼지 정보
 https://watchdust.appspot.com/watchDust
@@ -91,19 +117,24 @@ https://github.com/ysoftman/watchDust
 }
 
 func handlerWatchingDust(w http.ResponseWriter, r *http.Request) {
-	ctx := appengine.NewContext(r)
-	appenginelog.Infof(ctx, "/watchDust 요청 처리")
+	logInfo(r, "/watchDust 요청 처리")
 	query := r.URL.Query()
 
 	log.Println("---------- openapiAirKoreaGAE")
-	airResult := openapiAirKoreaGAE(r)
+	airResult := airKorea(r)
 	dustinfomsg := analDustInfo(airResult)
 	out := dustinfomsg
 
-	log.Println("----------", query.Get("slack"))
+	log.Println("---------- slack channel:", query.Get("slack"))
 	if len(query.Get("slack")) > 0 {
-		sendToSlackGAE(r, query.Get("slack"), dustinfomsg)
 		out += "slack channel = " + query.Get("slack")
+		err, respMsg := slack(r, query.Get("slack"), dustinfomsg)
+		if err != nil {
+			log.Println(err)
+			out += err.Error()
+		} else {
+			out += "\n" + respMsg
+		}
 	}
 	SetCommonResponseHeader(w)
 	if _, err := fmt.Fprintln(w, out); err != nil {
@@ -111,7 +142,7 @@ func handlerWatchingDust(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func watchingDust() {
+func cronWatchingDust() {
 	// var wg sync.WaitGroup
 	// wg.Add(1)
 	// go func() {
@@ -120,26 +151,28 @@ func watchingDust() {
 	// 		select {
 	// 		case <-time.After(time.Duration(conf.WatchIntervalHour) * time.Hour):
 	// 			// fineDustMsg = fineDustSearch())
-	// 			analDustInfo(openapiAirKorea())
+	// 			analDustInfo(airKorea(nil))
 	// 		}
 	// 	}
 	// }()
 	// wg.Wait()
 
-	// analDustInfo(openapiAirKorea())
+	// analDustInfo(airKorea(nil))
 
 	c := cron.New()
 	// c.AddFunc("0 30 * * * *", func() { fmt.Println("Every hour on the half hour") })
 	// every second
-	// c.AddFunc("* * * * * *", func() { analDustInfo(openapiAirKorea()) })
+	// c.AddFunc("* * * * * *", func() { analDustInfo(airKorea(nil)) })
 	// every minute
-	// c.AddFunc("0 */1 * * * *", func() { analDustInfo(openapiAirKorea()) })
+	// c.AddFunc("0 */1 * * * *", func() { analDustInfo(airKorea(nil)) })
 	// c.AddFunc("@hourly", func() { fmt.Println("Every hour") })
 	// 9-21/3 : 9~21시 사이 3시간 간격으로 => 9 12 15 18 21시
 	if err := c.AddFunc("0 0 9-21/"+strconv.Itoa(conf.WatchIntervalHour)+" * * *", func() {
-		airResult := openapiAirKorea()
+		airResult := airKorea(nil)
 		dustinfomsg := analDustInfo(airResult)
-		sendToSlack(conf.SlackAPI.Channel, dustinfomsg)
+		if err, _ := slack(nil, conf.SlackAPI.Channel, dustinfomsg); err != nil {
+			log.Println(err)
+		}
 	}); err != nil {
 		log.Println(err)
 	}

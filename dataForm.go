@@ -3,6 +3,7 @@ package main
 type serverConfig struct {
 	Title             string `toml:"Title"`
 	WatchIntervalHour int    `toml:"WatchIntervalHour"`
+	Port              int    `toml:"Port" env:"WATCHDUST_PORT" envDefault:"8080"`
 	OpenapiAirkorea   struct {
 		URL        string `toml:"url"`
 		Servicekey string `toml:"servicekey" env:"WATCHDUST_OPENAPIAIRKOREA_SERVICE_KEY" envDefault:""`

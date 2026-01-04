@@ -15,7 +15,8 @@
 - slack 알림
 
   - 채널 메시지 보내기 api : <https://api.slack.com/methods/chat.postMessage>
-  - 토근 발급 : <https://api.slack.com/custom-integrations/legacy-tokens>
+  - 토근 : <https://api.slack.com/apps> > 앱선택 > install app > oauth tokens
+    - oauth & permissions > scopes > add an oauth scopes > chart:write 추가 후 reinstall
   - 사용예
 
   ```bash
@@ -43,9 +44,6 @@ zzz
 
 # 일반 서버 환경
 go build && . .env && ./watchdust -servertype normal
-
-# 테스트로 한번 실행하고 종료
-go build && . .env && ./watchdust -servertype test
 ```
 
 ## google app engine 사용

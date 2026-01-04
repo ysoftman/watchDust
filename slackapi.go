@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"io"
-	"log"
 	"net/http"
 	"time"
 
@@ -22,7 +21,7 @@ func getSlackURL(slackchannel, msg string) string {
 		"&text=" + msg
 }
 
-func sendToSlackGAE(r *http.Request, slackchannel, msg string) {
+func sendToSlackGAE(r *http.Request, slackchannel, msg string) (error, string) {
 	content := getSlackURL(slackchannel, msg)
 	reqBody := bytes.NewBufferString(content)
 
@@ -35,22 +34,19 @@ func sendToSlackGAE(r *http.Request, slackchannel, msg string) {
 	client.Timeout = time.Second * 3
 	resp, err := client.Post("https://slack.com/api/chat.postMessage", "application/x-www-form-urlencoded", reqBody)
 	if err != nil {
-		log.Println(err)
-		return
+		return err, ""
 	}
-
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Println(err)
-	} else {
-		log.Printf("%s ... send to slack is success\n", string(respBody))
+		return err, ""
 	}
 	if err := resp.Body.Close(); err != nil {
-		log.Println(err)
+		return err, ""
 	}
+	return nil, string(respBody)
 }
 
-func sendToSlack(slackchannel, msg string) {
+func sendToSlack(slackchannel, msg string) (error, string) {
 	content := getSlackURL(slackchannel, msg)
 	reqBody := bytes.NewBufferString(content)
 	client := http.Client{
@@ -58,17 +54,14 @@ func sendToSlack(slackchannel, msg string) {
 	}
 	resp, err := client.Post("https://slack.com/api/chat.postMessage", "application/x-www-form-urlencoded", reqBody)
 	if err != nil {
-		log.Println(err)
-		return
+		return err, ""
 	}
-
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Println(err)
-	} else {
-		log.Printf("%s ... send to slack is success\n", string(respBody))
+		return err, ""
 	}
 	if err := resp.Body.Close(); err != nil {
-		log.Println(err)
+		return err, ""
 	}
+	return nil, string(respBody)
 }
