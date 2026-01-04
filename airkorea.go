@@ -46,7 +46,6 @@ func openapiAirKoreaGAE(r *http.Request) *dustinfoResp {
 		log.Println(err.Error())
 		return &dustinfoResp{}
 	}
-	defer resp.Body.Close()
 
 	// 응답결과 출력
 	// io.ReadAll 로 resp.Body 읽고 나면 resp.Body 내용은 사라진다.
@@ -55,10 +54,16 @@ func openapiAirKoreaGAE(r *http.Request) *dustinfoResp {
 		log.Println("can't read resp.Body")
 		return &dustinfoResp{}
 	}
+	if err := resp.Body.Close(); err != nil {
+		log.Println(err)
+	}
+
 	// bodystring := string(body)
 	// log.Println(bodystring)
 	jsonDustInfo := &dustinfoResp{}
-	json.Unmarshal([]byte(body), &jsonDustInfo)
+	if err := json.Unmarshal([]byte(body), &jsonDustInfo); err != nil {
+		log.Println(err)
+	}
 
 	return jsonDustInfo
 }
@@ -74,7 +79,6 @@ func openapiAirKorea() *dustinfoResp {
 		log.Println(err.Error())
 		return &dustinfoResp{}
 	}
-	defer resp.Body.Close()
 
 	// 응답결과 출력
 	// io.ReadAll 로 resp.Body 읽고 나면 resp.Body 내용은 사라진다.
@@ -83,10 +87,16 @@ func openapiAirKorea() *dustinfoResp {
 		log.Println("can't read resp.Body")
 		return &dustinfoResp{}
 	}
+	if err := resp.Body.Close(); err != nil {
+		log.Println(err)
+	}
+
 	// bodystring := string(body)
 	// log.Println(jsonDustInfo)
 	jsonDustInfo := &dustinfoResp{}
-	json.Unmarshal([]byte(body), &jsonDustInfo)
+	if err := json.Unmarshal([]byte(body), &jsonDustInfo); err != nil {
+		log.Println(err)
+	}
 
 	return jsonDustInfo
 }

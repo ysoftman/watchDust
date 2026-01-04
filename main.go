@@ -18,10 +18,8 @@ import (
 
 const configFileName = "watchDustConfig.toml"
 
-var (
-	fineDustMsg = ""
-	conf        serverConfig
-)
+// fineDustMsg = ""
+var conf serverConfig
 
 func loadConfig() {
 	if _, err := toml.DecodeFile(configFileName, &conf); err != nil {
@@ -87,7 +85,9 @@ github
 https://github.com/ysoftman/watchDust
 `
 	SetCommonResponseHeader(w)
-	fmt.Fprintln(w, out)
+	if _, err := fmt.Fprintln(w, out); err != nil {
+		log.Println(err)
+	}
 }
 
 func handlerWatchingDust(w http.ResponseWriter, r *http.Request) {
@@ -106,7 +106,9 @@ func handlerWatchingDust(w http.ResponseWriter, r *http.Request) {
 		out += "slack channel = " + query.Get("slack")
 	}
 	SetCommonResponseHeader(w)
-	fmt.Fprintln(w, out)
+	if _, err := fmt.Fprintln(w, out); err != nil {
+		log.Println(err)
+	}
 }
 
 func watchingDust() {
@@ -134,11 +136,13 @@ func watchingDust() {
 	// c.AddFunc("0 */1 * * * *", func() { analDustInfo(openapiAirKorea()) })
 	// c.AddFunc("@hourly", func() { fmt.Println("Every hour") })
 	// 9-21/3 : 9~21시 사이 3시간 간격으로 => 9 12 15 18 21시
-	c.AddFunc("0 0 9-21/"+strconv.Itoa(conf.WatchIntervalHour)+" * * *", func() {
+	if err := c.AddFunc("0 0 9-21/"+strconv.Itoa(conf.WatchIntervalHour)+" * * *", func() {
 		airResult := openapiAirKorea()
 		dustinfomsg := analDustInfo(airResult)
 		sendToSlack(conf.SlackAPI.Channel, dustinfomsg)
-	})
+	}); err != nil {
+		log.Println(err)
+	}
 	c.Start()
 	select {}
 	// for {

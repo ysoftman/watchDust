@@ -16,7 +16,7 @@ pageNo = 1
 [slack_api]
 # 토큰
 token = ""
-# 메시지 보낼 채널
+# 메시지 보낼 (디폴트)채널
 channel = "dustinfo"
 # 봇이름
 username = "watchDust bot"
