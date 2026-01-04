@@ -104,7 +104,7 @@ func handlerIndex(w http.ResponseWriter, r *http.Request) {
 디폴트 미세먼지 정보
 https://watchdust.appspot.com/watchDust
 
-dustinfo 슬랙 채널에 미세먼지 정보 발송
+슬랙 채널(예:dustinfo)에 미세먼지 정보 발송(Bot User OAuth Token이 등록된 경우)
 https://watchdust.appspot.com/watchDust?slack=dustinfo
 
 github
