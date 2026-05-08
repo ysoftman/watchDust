@@ -58,6 +58,7 @@ func main() {
 	appMux := http.NewServeMux()
 	appMux.HandleFunc("/", handlerIndex)
 	appMux.HandleFunc("/watchdust", handlerWatchingDust)
+	appMux.HandleFunc("/version", handlerVersion)
 
 	http.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		r.URL.Path = strings.ToLower(r.URL.Path)
