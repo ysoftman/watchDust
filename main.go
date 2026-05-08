@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/BurntSushi/toml"
 	"github.com/caarlos0/env/v11"
@@ -54,8 +55,14 @@ func main() {
 	flag.Parse()
 	isGAE = (*serverType == "gae")
 	log.Println("servertype :", *serverType)
-	http.HandleFunc("/", handlerIndex)
-	http.HandleFunc("/watchDust", handlerWatchingDust)
+	appMux := http.NewServeMux()
+	appMux.HandleFunc("/", handlerIndex)
+	appMux.HandleFunc("/watchdust", handlerWatchingDust)
+
+	http.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		r.URL.Path = strings.ToLower(r.URL.Path)
+		appMux.ServeHTTP(w, r)
+	}))
 	switch *serverType {
 	case "normal":
 		// 일반 서버 환경으로 운영시
@@ -78,7 +85,7 @@ func SetCommonResponseHeader(w http.ResponseWriter) {
 func logInfo(r *http.Request, msg string) {
 	if isGAE {
 		ctx := appengine.NewContext(r)
-		appenginelog.Infof(ctx, msg)
+		appenginelog.Infof(ctx, "%s", msg)
 	} else {
 		log.Println(msg)
 	}

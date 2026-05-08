@@ -7,7 +7,7 @@ WatchIntervalHour = 3
 Port = 8080
 
 [openapi_airkorea]
-url = "http://apis.data.go.kr/B552584/ArpltnInforInqireSvc/getMinuDustFrcstDspth"
+url = "https://apis.data.go.kr/B552584/ArpltnInforInqireSvc/getMinuDustFrcstDspth"
 # 서비스키
 servicekey = ""
 # 한 페이지 결과 수

@@ -1,4 +1,4 @@
-runtime: go122
+runtime: go126
 app_engine_apis: true
 handlers:
   - url: /.*

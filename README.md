@@ -26,23 +26,22 @@
 ## 빌드 및 실행
 
 ```bash
-# get packages
-go get ./...
-
-# build
-go build
-
-# execute
-# default:gae(google app engin) 환경
-./watchdust
-
 # 로컬에서 환경변수로 테스트할때 사용할 파일 생성
 cat << zzz > .env
 export WATCHDUST_OPENAPIAIRKOREA_SERVICE_KEY=""
 export WATCHDUST_SLACKAPI_TOKEN=""
 zzz
 
-# 일반 서버 환경
+# get packages
+go get ./...
+
+# build
+go build
+
+# default:gae(google app engin) 환경으로 실행
+go build && . .env && ./watchdust
+
+# 일반 서버 환경으로 실행
 go build && . .env && ./watchdust -servertype normal
 ```
 

@@ -58,11 +58,9 @@ func openapiAirKoreaGAE(r *http.Request) *dustinfoResp {
 		log.Println(err)
 	}
 
-	// bodystring := string(body)
-	// log.Println(bodystring)
 	jsonDustInfo := &dustinfoResp{}
-	if err := json.Unmarshal([]byte(body), &jsonDustInfo); err != nil {
-		log.Println(err)
+	if err := json.Unmarshal(body, &jsonDustInfo); err != nil {
+		log.Printf("json unmarshal error: %v\nstatus: %s\nbody: %s\n", err, resp.Status, string(body))
 	}
 
 	return jsonDustInfo
@@ -91,11 +89,9 @@ func openapiAirKorea() *dustinfoResp {
 		log.Println(err)
 	}
 
-	// bodystring := string(body)
-	// log.Println(jsonDustInfo)
 	jsonDustInfo := &dustinfoResp{}
-	if err := json.Unmarshal([]byte(body), &jsonDustInfo); err != nil {
-		log.Println(err)
+	if err := json.Unmarshal(body, &jsonDustInfo); err != nil {
+		log.Printf("json unmarshal error: %v\nstatus: %s\nbody: %s\n", err, resp.Status, string(body))
 	}
 
 	return jsonDustInfo
