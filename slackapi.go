@@ -21,7 +21,7 @@ func getSlackURL(slackchannel, msg string) string {
 		"&text=" + msg
 }
 
-func sendToSlackGAE(r *http.Request, slackchannel, msg string) (error, string) {
+func sendToSlackGAE(r *http.Request, slackchannel, msg string) (string, error) {
 	content := getSlackURL(slackchannel, msg)
 	reqBody := bytes.NewBufferString(content)
 
@@ -34,19 +34,19 @@ func sendToSlackGAE(r *http.Request, slackchannel, msg string) (error, string) {
 	client.Timeout = time.Second * 3
 	resp, err := client.Post("https://slack.com/api/chat.postMessage", "application/x-www-form-urlencoded", reqBody)
 	if err != nil {
-		return err, ""
+		return "", err
 	}
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return err, ""
+		return "", err
 	}
 	if err := resp.Body.Close(); err != nil {
-		return err, ""
+		return "", err
 	}
-	return nil, string(respBody)
+	return string(respBody), nil
 }
 
-func sendToSlack(slackchannel, msg string) (error, string) {
+func sendToSlack(slackchannel, msg string) (string, error) {
 	content := getSlackURL(slackchannel, msg)
 	reqBody := bytes.NewBufferString(content)
 	client := http.Client{
@@ -54,14 +54,14 @@ func sendToSlack(slackchannel, msg string) (error, string) {
 	}
 	resp, err := client.Post("https://slack.com/api/chat.postMessage", "application/x-www-form-urlencoded", reqBody)
 	if err != nil {
-		return err, ""
+		return "", err
 	}
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return err, ""
+		return "", err
 	}
 	if err := resp.Body.Close(); err != nil {
-		return err, ""
+		return "", err
 	}
-	return nil, string(respBody)
+	return string(respBody), nil
 }

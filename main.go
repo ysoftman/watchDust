@@ -99,7 +99,7 @@ func airKorea(r *http.Request) *dustinfoResp {
 	return openapiAirKorea()
 }
 
-func slack(r *http.Request, channel, msg string) (error, string) {
+func slack(r *http.Request, channel, msg string) (string, error) {
 	if isGAE {
 		return sendToSlackGAE(r, channel, msg)
 	}
@@ -109,14 +109,17 @@ func slack(r *http.Request, channel, msg string) (error, string) {
 func handlerIndex(w http.ResponseWriter, r *http.Request) {
 	logInfo(r, "/ 요청 처리")
 	out := `
+버전 정보
+https://watchdust.appspot.com/version
+
 디폴트 미세먼지 정보
-https://watchdust.appspot.com/watchDust
+https://watchdust.appspot.com/watchdust
 
 슬랙 채널(예:dustinfo)에 미세먼지 정보 발송(Bot User OAuth Token이 등록된 경우)
-https://watchdust.appspot.com/watchDust?slack=dustinfo
+https://watchdust.appspot.com/watchdust?slack=dustinfo
 
 github
-https://github.com/ysoftman/watchDust
+https://github.com/ysoftman/watchdust
 `
 	SetCommonResponseHeader(w)
 	if _, err := fmt.Fprintln(w, out); err != nil {
@@ -125,7 +128,7 @@ https://github.com/ysoftman/watchDust
 }
 
 func handlerWatchingDust(w http.ResponseWriter, r *http.Request) {
-	logInfo(r, "/watchDust 요청 처리")
+	logInfo(r, "/watchdust 요청 처리")
 	query := r.URL.Query()
 
 	log.Println("---------- openapiAirKoreaGAE")
@@ -136,7 +139,7 @@ func handlerWatchingDust(w http.ResponseWriter, r *http.Request) {
 	if len(query.Get("slack")) > 0 {
 		log.Println("---------- slack channel:", query.Get("slack"))
 		out += "slack channel = " + query.Get("slack")
-		err, respMsg := slack(r, query.Get("slack"), dustinfomsg)
+		respMsg, err := slack(r, query.Get("slack"), dustinfomsg)
 		if err != nil {
 			log.Println(err)
 			out += err.Error()
@@ -178,7 +181,7 @@ func cronWatchingDust() {
 	if err := c.AddFunc("0 0 9-21/"+strconv.Itoa(conf.WatchIntervalHour)+" * * *", func() {
 		airResult := airKorea(nil)
 		dustinfomsg := analDustInfo(airResult)
-		if err, _ := slack(nil, conf.SlackAPI.Channel, dustinfomsg); err != nil {
+		if _, err := slack(nil, conf.SlackAPI.Channel, dustinfomsg); err != nil {
 			log.Println(err)
 		}
 	}); err != nil {
