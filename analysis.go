@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 	"slices"
-	"strconv"
 	"strings"
 )
 
@@ -75,7 +74,7 @@ func matchedImageURLs(it dustinfoItem) []string {
 		aliases = []string{it.InformCode}
 	}
 	var lines []string
-	for i, url := range it.ImageURLs() {
+	for _, url := range it.ImageURLs() {
 		if len(url) == 0 {
 			continue
 		}
@@ -84,7 +83,7 @@ func matchedImageURLs(it dustinfoItem) []string {
 		}) {
 			continue
 		}
-		lines = append(lines, "imageUrl"+strconv.Itoa(i+1)+": "+url)
+		lines = append(lines, url)
 	}
 	return lines
 }
